@@ -18,6 +18,11 @@ final class MarkdownParser
 
     public function toHtml(string $markdown): string
     {
-        return $this->parser->text($markdown);
+        $html = $this->parser->text($markdown);
+
+        return strip_tags(
+            $html,
+            '<p><br><a><strong><em><ul><ol><li><blockquote><pre><code><h1><h2><h3><h4><h5><h6><hr>',
+        );
     }
 }

@@ -26,13 +26,8 @@ final class PostRepository
         }
 
         $posts = [];
-        $iterator = new RegexIterator(
-            new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->postsDirectory)),
-            '/^.+\.md$/i',
-        );
-
-        foreach ($iterator as $file) {
-            $post = Post::fromFile((string) $file, $this->markdownParser);
+        foreach ($this->postFiles() as $filePath) {
+            $post = Post::fromFile($filePath, $this->markdownParser);
             $posts[] = $post;
         }
 
@@ -50,12 +45,34 @@ final class PostRepository
             return null;
         }
 
-        foreach ($this->all() as $post) {
+        foreach ($this->postFiles() as $filePath) {
+            if (pathinfo($filePath, PATHINFO_FILENAME) !== $slug) {
+                continue;
+            }
+
+            $post = Post::fromFile($filePath, $this->markdownParser);
             if ($post->slug === $slug) {
                 return $post;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @return iterable<string>
+     */
+    private function postFiles(): iterable
+    {
+        $iterator = new RegexIterator(
+            new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($this->postsDirectory, RecursiveDirectoryIterator::SKIP_DOTS),
+            ),
+            '/^.+\.md$/i',
+        );
+
+        foreach ($iterator as $file) {
+            yield (string) $file;
+        }
     }
 }

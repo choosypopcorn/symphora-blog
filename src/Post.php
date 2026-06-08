@@ -40,7 +40,7 @@ final class Post
         $fileName = pathinfo($path, PATHINFO_FILENAME);
         $title = isset($metadata['title']) && is_string($metadata['title'])
             ? trim($metadata['title'])
-            : str_replace('-', ' ', ucfirst($fileName));
+            : ucwords(str_replace('-', ' ', $fileName));
         $slug = isset($metadata['slug']) && is_string($metadata['slug']) ? trim($metadata['slug']) : $fileName;
         $author = isset($metadata['author']) && is_string($metadata['author']) ? trim($metadata['author']) : null;
 
