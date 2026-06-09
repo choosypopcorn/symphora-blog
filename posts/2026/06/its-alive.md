@@ -1,5 +1,5 @@
 ---
-title: It's Alive: The Return of the Blog
+title: It's Alive - The Return of the Blog
 date: 2026-06-08
 author: Elmer
 tags: [php, markdown, twig]
