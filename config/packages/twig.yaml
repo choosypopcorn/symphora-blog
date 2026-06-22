@@ -1,0 +1,10 @@
+twig:
+    globals:
+        base_url: '%kernel.project_dir%/public' # Adjust to your webroot
+    default_path: '%kernel.project_dir%/templates'
+    # If you need to register additional template paths or namespaces, use `paths:`:
+    # paths:
+    #     '%kernel.project_dir%/templates': ~
+when@test:
+    twig:
+        strict_variables: true
