@@ -4,13 +4,14 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
     /**
      * @Route("/login", name="app_login")
      */
+    #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authUtils)
     {
         // Login logic using session-based auth
@@ -19,6 +20,7 @@ class UserController extends AbstractController
     /**
      * @Route("/register", methods={"POST"}, name="app_register")
      */
+    #[Route('/register', name: 'app_register', methods: ['POST'])]
     public function register(Request $request)
     {
         if (!$this->getUser()) { // Ensure not already logged in
@@ -40,6 +42,7 @@ class UserController extends AbstractController
     /**
      * @Route("/logout", name="app_logout")
      */
+    #[Route('/logout', name: 'app_logout')]
     public function logout()
     {
         // Logout logic handled by Symfony's Security component

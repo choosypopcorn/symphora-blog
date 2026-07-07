@@ -3,14 +3,17 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use League\Commonmark\Parser;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use League\Commonmark\Parser;
 
 class PostController extends AbstractController
 {
-    private $storagePath;
+    private string $storagePath;
+    private Filesystem $filesystem;
 
     public function __construct()
     {
@@ -18,9 +21,59 @@ class PostController extends AbstractController
         $this->filesystem = new Filesystem();
     }
 
+    #[Route('/', name: 'homepage')]
+    public function homepage(): Response
+    {
+        $posts = [];
+
+        if (file_exists($this->storagePath)) {
+            $posts = json_decode(file_get_contents($this->storagePath), true) ?: [];
+        }
+
+        usort($posts, static function (array $left, array $right): int {
+            $leftDate = $left['date'] ?? null;
+            $rightDate = $right['date'] ?? null;
+
+            if (is_object($leftDate) && method_exists($leftDate, 'getTimestamp')) {
+                $leftDate = $leftDate->getTimestamp();
+            }
+
+            if (is_object($rightDate) && method_exists($rightDate, 'getTimestamp')) {
+                $rightDate = $rightDate->getTimestamp();
+            }
+
+            if (is_string($leftDate)) {
+                $leftDate = strtotime($leftDate);
+            }
+
+            if (is_string($rightDate)) {
+                $rightDate = strtotime($rightDate);
+            }
+
+            if ($leftDate === $rightDate) {
+                return 0;
+            }
+
+            if ($leftDate === null) {
+                return 1;
+            }
+
+            if ($rightDate === null) {
+                return -1;
+            }
+
+            return $leftDate < $rightDate ? 1 : -1;
+        });
+
+        return $this->render('post/index.html.twig', [
+            'posts' => $posts,
+        ]);
+    }
+
     /**
      * @Route("/create", name="create")
      */
+    #[Route('/create', name: 'create', methods: ['POST'])]
     public function create(Request $request)
     {
         if ($request->isXmlHttpRequest()) {
@@ -34,6 +87,7 @@ class PostController extends AbstractController
     /**
      * @Route("/save", name="save", methods={"POST"})
      */
+    #[Route('/save', name: 'save', methods: ['POST'])]
     public function save(Request $request)
     {
         if (!$this->getUser()) {

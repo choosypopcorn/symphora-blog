@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
 
 class RssController extends AbstractController
@@ -10,6 +12,7 @@ class RssController extends AbstractController
     /**
      * @Route("/rss", name="app_rss")
      */
+    #[Route('/rss', name: 'app_rss')]
     public function generateRss(Environment $twig)
     {
         $posts = json_decode(file_get_contents(__DIR__ . '/../../../../config/storage.php')['posts'], true) ?: [];

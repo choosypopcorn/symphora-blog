@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container" style="max-width: 800px; margin: 2rem auto; padding: 0 1rem;">
+        <h1>Posts</h1>
+
+        {% if posts is empty %}
+            <p>No posts yet.</p>
+        {% else %}
+            <ul>
+                {% for post in posts %}
+                    <li style="margin-bottom: 1rem;">
+                        <h2>{{ post.title|default('Untitled post') }}</h2>
+                        <p>{{ post.content|default('')|striptags|slice(0, 200) }}</p>
+                        <small>By {{ post.author|default('Unknown') }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endblock %}
