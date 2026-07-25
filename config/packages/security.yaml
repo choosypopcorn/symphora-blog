@@ -1,34 +1,30 @@
 security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'bcrypt'
+    
     providers:
-        app_user_provider:
-            memory:
-                users:
-                    admin:
-                        password: '$2y$10$hashed_password_here' # Replace with actual hash from storage.php
-                        roles: ['ROLE_ADMIN']
+        json_users:
+            id: App\Security\JsonUserProvider
     
     firewalls:
-        api:
-            pattern: ^/api
-            stateless: true
-            http_basic: true
-            provider: app_user_provider
-
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        
         main:
-            stateless: true
-
-            form_login:
-                provider: app_user_provider
-                login_path: app_login
-                check_path: app_login
-                csrf_token_id: security.csrf.token_manager
-
+            lazy: true
+            provider: json_users
+            custom_authenticator: App\Security\JsonAuthenticator
             logout:
                 path: app_logout
-                invalidate_session: true
+                target: homepage
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
 
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/create, roles: ROLE_USER }
+        - { path: ^/save, roles: ROLE_USER }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
