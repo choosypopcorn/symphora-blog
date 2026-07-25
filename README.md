@@ -1,48 +1,45 @@
-# symphora-blog
+# Symphora Blog
 
-A simple blogging system built with:
+A simple Symfony-based blog application that lets you create and view posts, plus expose an RSS feed.
 
-- PHP
-- Twig templates
-- Markdown posts stored in the filesystem
-- Git for version control of content and code
+## Features
 
-## Project structure
+- Homepage that lists saved posts
+- Post creation form
+- Simple RSS feed at `/rss`
+- Post storage via JSON files in the `data` directory
 
-```text
-posts/       Markdown blog posts (with frontmatter metadata)
-public/      Web entrypoint (`index.php`)
-src/         Blog, post repository, and parsing logic
-templates/   Twig templates
-```
+## Requirements
 
-## Getting started
+- PHP 8.4+
+- Composer
+- A local web server or Symfony server
 
-```bash
-composer install
-php -S localhost:8000 -t public
-```
+## Installation
 
-Open <http://localhost:8000>.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   composer install
+   ```
+3. Start the Symfony development server:
+   ```bash
+   php -S 127.0.0.1:8000 -t public
+   ```
 
-## Post format
+## Usage
 
-Posts use Markdown with YAML frontmatter:
+- Open `http://127.0.0.1:8000/` to view the homepage
+- Visit `http://127.0.0.1:8000/create` to access the post creation view
+- Visit `http://127.0.0.1:8000/rss` to view the RSS feed
 
-```markdown
----
-title: My First Blog Post
-date: 2026-06-07
-author: Symphora
-tags: [php, markdown, twig]
-slug: my-first-post
----
+## Project Structure
 
-# My First Blog Post
+- `src/Controller` — application controllers
+- `templates/` — Twig templates
+- `config/` — Symfony configuration and route setup
+- `data/` — stored blog content
 
-Post content...
-```
+## Notes
 
-## Tests
-
-This repository currently does not include an automated test suite.
+Posts are currently stored in JSON files configured in `config/storage.php`.

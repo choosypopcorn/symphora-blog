@@ -1,28 +1,9 @@
 <?php
 
-declare(strict_types=1);
+use App\Kernel;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
-use SymphoraBlog\Blog;
-
-$blog = new Blog(
-    dirname(__DIR__) . '/templates',
-    dirname(__DIR__) . '/posts',
-);
-
-$postSlug = $_GET['post'] ?? null;
-
-if (is_string($postSlug) && $postSlug !== '') {
-    $renderedPost = $blog->renderPost($postSlug);
-    if ($renderedPost === null) {
-        http_response_code(404);
-        echo 'Post not found';
-        return;
-    }
-
-    echo $renderedPost;
-    return;
-}
-
-echo $blog->renderIndex();
+return static function (array $context) {
+    return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+};

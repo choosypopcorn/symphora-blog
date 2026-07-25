@@ -1,0 +1,30 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'bcrypt'
+    
+    providers:
+        json_users:
+            id: App\Security\JsonUserProvider
+    
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        
+        main:
+            lazy: true
+            provider: json_users
+            custom_authenticator: App\Security\JsonAuthenticator
+            logout:
+                path: app_logout
+                target: homepage
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+
+    access_control:
+        - { path: ^/create, roles: ROLE_USER }
+        - { path: ^/save, roles: ROLE_USER }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
