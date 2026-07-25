@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use League\Commonmark\Parser;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
 
 class PostController extends AbstractController
 {
@@ -70,59 +70,76 @@ class PostController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create", name="create")
-     */
-    #[Route('/create', name: 'create', methods: ['POST'])]
-    public function create(Request $request)
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
+    public function create(Request $request): Response
     {
-        if ($request->isXmlHttpRequest()) {
+        if ($request->isMethod('POST') && $request->headers->get('X-Requested-With') === 'XMLHttpRequest') {
             // Handle AJAX request for markdown preview
-            return new Response(Parser::parse($request->get('content'))); 
+            $content = $request->getPayload()->get('content');
+            $converter = new GithubFlavoredMarkdownConverter();
+            $html = $converter->convert($content)->getContent();
+            return new Response($html);
         }
-        
+
+        // Display the create form
         return $this->render('post/create.html.twig');
     }
 
-    /**
-     * @Route("/save", name="save", methods={"POST"})
-     */
     #[Route('/save', name: 'save', methods: ['POST'])]
-    public function save(Request $request)
+    public function save(Request $request): Response
     {
         if (!$this->getUser()) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedException('You must be logged in to create posts.');
         }
 
-        $data = json_decode(file_get_contents($this->storagePath), true) ?: [];
+        $title = $request->getPayload()->get('title');
+        $content = $request->getPayload()->get('content');
+
+        if (!$title || !$content) {
+            return new Response('Title and content are required.', 400);
+        }
+
+        // Parse markdown to HTML
+        $converter = new GithubFlavoredMarkdownConverter();
+        $htmlContent = $converter->convert($content)->getContent();
+
+        // Handle image uploads
+        $images = [];
+        $uploadedFiles = $request->files->get('images', []);
+        if (!is_array($uploadedFiles)) {
+            $uploadedFiles = [$uploadedFiles];
+        }
+
+        foreach ($uploadedFiles as $file) {
+            if ($file && $file->isValid()) {
+                $filename = uniqid() . '_' . $file->getClientOriginalName();
+                $file->move('uploads/images', $filename);
+                $images[] = '/uploads/images/' . $filename;
+            }
+        }
+
+        // Load existing posts
+        $data = [];
+        if (file_exists($this->storagePath)) {
+            $data = json_decode(file_get_contents($this->storagePath), true) ?: [];
+        }
+
+        // Create new post
         $post = [
-            'title' => $request->get('title'),
-            'content' => $request->get('content'),
-            'author' => $this->getUser()-> getUsername(),
-            'date' => new \DateTime(),
-            'images' => $request->get('images', []) // Array of image paths
+            'id' => uniqid(),
+            'title' => $title,
+            'content' => $htmlContent,
+            'author' => $this->getUser()->getUsername(),
+            'date' => date('Y-m-d H:i:s'),
+            'images' => $images,
         ];
 
-        if (isset($post['id'])) {
-            // Update existing post
-            foreach ($data as &$item) {
-                if ($item['id'] == $post['id']) {
-                    $item = array_merge($item, $post);
-                    break;
-                }
-            }
-        } else {
-            // Generate new ID and add post
-            static::$ids ??= [];
-            do {
-                $newId = random_int(1000, 9999);
-            } while (in_array($newId, array_column($data, 'id')) && isset(static::$ids[$newId]));
-            
-            $post['id'] = $newId;
-            static::$ids[$newId] = true; // Simple in-memory tracking
-        }
+        // Add post to array
+        $data[] = $post;
 
-        $this->filesystem->dumpFile($this->storagePath, json_encode(array_merge($data, [$post]), JSON_PRETTY_PRINT));
+        // Save to file
+        $this->filesystem->dumpFile($this->storagePath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
         return new Response('Post saved successfully');
     }
 }
