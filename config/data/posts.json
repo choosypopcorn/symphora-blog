@@ -1,1 +1,20 @@
-[]
+[
+    {
+        "id": "6a642e08a3d1f",
+        "title": "My Very First Post",
+        "content": "<h3>This is cool.</h3>\n<p>We like markdown.</p>\n",
+        "author": "elmer",
+        "date": "2026-07-25 03:31:20",
+        "images": []
+    },
+    {
+        "id": "6a642ec842eea",
+        "title": "An Image?",
+        "content": "<p>Here is an <em>image</em>. Will it work?</p>\n",
+        "author": "elmer",
+        "date": "2026-07-25 03:34:32",
+        "images": [
+            "/uploads/images/6a642ec8428c5_Screenshot 2026-01-04 161504.png"
+        ]
+    }
+]
