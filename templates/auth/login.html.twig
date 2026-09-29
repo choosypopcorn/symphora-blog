@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Login - Symphora Blog{% endblock %}
+
+{% block body %}
+<div style="max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+    <h1 style="text-align: center; margin-bottom: 30px;">Login</h1>
+
+    {% if error %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{{ path('app_login') }}">
+        <div style="margin-bottom: 15px;">
+            <label for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">Username:</label>
+            <input type="text" id="username" name="username" value="{{ last_username }}" required autofocus style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">Password:</label>
+            <input type="password" id="password" name="password" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="_remember_me" style="display: flex; align-items: center;">
+                <input type="checkbox" id="_remember_me" name="_remember_me" style="margin-right: 8px;">
+                Remember me
+            </label>
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;">
+            Sign in
+        </button>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center;">
+        <p>Don't have an account? <a href="{{ path('app_register') }}">Register here</a></p>
+    </div>
+</div>
+{% endblock %}

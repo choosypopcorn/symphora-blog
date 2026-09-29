@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>My Blog</title>
+        <link>{{ constant('APP_BASE_URL') }}</link>
+        
+        {% for post in posts %}
+            <item>
+                <title>{{ post.title|escape }}</title>
+                <description><![CDATA[{{ marked(post.content) }}]]></description>
+                <pubDate>{{ post.date|date('D, d M Y H:i:s e') }}</pubDate>
+            </item>
+        {% endfor %}
+    </channel>
+</rss>
