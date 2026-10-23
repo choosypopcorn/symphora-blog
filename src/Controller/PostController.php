@@ -112,6 +112,35 @@ class PostController extends AbstractController
 
         foreach ($uploadedFiles as $file) {
             if ($file && $file->isValid()) {
+                // Validate file size (max 5MB)
+                if ($file->getSize() > 5 * 1024 * 1024) {
+                    continue; // Skip files larger than 5MB
+                }
+
+                // Validate MIME type against whitelist
+                $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                $mimeType = $file->getMimeType();
+
+                if (!in_array($mimeType, $allowedMimeTypes)) {
+                    continue; // Skip files with invalid MIME types
+                }
+
+                // Generate cryptographically secure filename
+                $extension = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+                $filename = uniqid('', true) . '_' . bin2hex(random_bytes(8)) . '.' . $extension;
+
+                $file->move('uploads/images', $filename);
+                $images[] = '/uploads/images/' . $filename;
+            }
+        }
+
+// ... rest of code ...
+        if (!is_array($uploadedFiles)) {
+            $uploadedFiles = [$uploadedFiles];
+        }
+
+        foreach ($uploadedFiles as $file) {
+            if ($file && $file->isValid()) {
                 $filename = uniqid() . '_' . $file->getClientOriginalName();
                 $file->move('uploads/images', $filename);
                 $images[] = '/uploads/images/' . $filename;
