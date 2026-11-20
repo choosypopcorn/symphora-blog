@@ -9,3 +9,64 @@ composer.phar
 # Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
 # composer.lock
+# Symfony specific
+/var/cache/*
+!/var/cache/.gitkeep
+/var/logs/*
+!/var/logs/.gitkeep
+/var/sessions/*
+!/var/sessions/.gitkeep
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+
+# PHPUnit
+/phpunit.xml
+/phpunit.xml.dist
+
+# Assets
+/public/build
+/public/assets
+
+# Node.js
+/node_modules
+*.log
+
+# Local configuration
+/config/packages/local.yaml
+/config/packages/test.yaml
+/config/packages/dev.yaml
+
+# Testing
+/tests/_output
+/tests/_support
+/tests/_data
+/tests/_envs
+
+# Docker
+.docker/
+.dockerignore
+
+# PHPStan
+/phpstan.neon
+/phpstan.neon.dist
+
+# SensioLabs Security Checker
+security-checker.phar
+
+# Symfony
+.symfony
+.symfony.local
+.webpackrc
+.webpackrc.js
+
+# Local files
+*.local
+*~.local
+.local
